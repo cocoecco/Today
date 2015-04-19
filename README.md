@@ -7,7 +7,7 @@ Today helps you see your progress for today, this week and all times, you can al
 select tasks from your list and share it with anyone you want.
 <br><br>
 The code demonstrates the use of CoreData, UIAnimation, Parse.com and AdMob among other features.
-This app is written in the Swift programming language using XCode 6.3
+This app is written in the Swift programming language along with a Objective-C code and a briging header.
 <br><br>
 Download the app for free on the app store at:
 <a href="https://itunes.apple.com/us/app/chicky-chute/id511456133?mt=8">Chicky Chute</a>
