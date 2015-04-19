@@ -14,6 +14,7 @@ class TutorialPage: UIViewController {
     var pageImage: String = ""
     var closeBtn: UIButton = UIButton()
     
+    let appColors = AppColors()
     
     func closeTutorial() {
         self.dismissViewControllerAnimated(true, completion: {
@@ -27,16 +28,16 @@ class TutorialPage: UIViewController {
         self.view.addSubview(pageImage)
         
         var btnTitle = "Skip"
-        if (pageIndex == 2) {
+        if (pageIndex == 3) {
             btnTitle = "Start"
         }
         
         let selfSize = self.view.frame.size
-        self.closeBtn = UIButton(frame: CGRectMake(selfSize.width/2-20, selfSize.height-70, 40, 20))
+        self.closeBtn = UIButton(frame: CGRectMake(selfSize.width-50, selfSize.height-65, 40, 20))
         self.closeBtn.setTitle(btnTitle, forState: .Normal)
         self.closeBtn.titleLabel?.font = UIFont.systemFontOfSize(18)
         
-        let blackColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
+        let blackColor = self.appColors.colorForObjectName("menu_btn_font_color")
         
         self.closeBtn.setTitleColor(blackColor, forState: .Normal)
         self.closeBtn.setTitleColor(blackColor, forState: .Selected)

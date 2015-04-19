@@ -11,7 +11,7 @@ import UIKit
 class TutorialController: UIViewController, UIPageViewControllerDataSource {
     
     var pageViewController: UIPageViewController?
-    var pageImages: Array<String> = ["T1", "T2"]
+    var pageImages: Array<String> = ["T1", "T2", "T3", "T4"]
     var currentIndex: Int = 0
     
     override func viewDidLoad() {

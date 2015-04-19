@@ -24,7 +24,7 @@ public class AppColors {
             return UIColor(red: 46/255.0, green: 204/255.0, blue: 113/255.0, alpha: 1.0)
         }
         else {
-            return UIColor(red: 189/255.0, green: 195/255.0, blue: 199/255.0, alpha: 1.0)
+            return UIColor(red: 239/255.0, green: 239/255.0, blue: 244/255.0, alpha: 1.0)
         }
     }
     
@@ -50,10 +50,16 @@ public class AppColors {
             return UIColor(red: 239/255.0, green: 239/255.0, blue: 244/255.0, alpha: 1.0)
         }
         else if (objName == "section_header_text") {
-            return UIColor(red: 81/255.0, green: 81/255.0, blue: 81/255.0, alpha: 1.0) //Dark Gray Color
+            return UIColor(red: 142/255.0, green: 142/255.0, blue: 147/255.0, alpha: 1.0) //Light Gray Color
         }
         else if (objName == "tasks_amount_text") {
             return UIColor(red: 12/255.0, green: 151/255.0, blue: 237/255.0, alpha: 1.0) //Blue Color
+        }
+        else if (objName == "pale_white") {
+            return UIColor(red: 247/255.0, green: 246/255.0, blue: 248/255.0, alpha: 1.0) //Pale White Color
+        }
+        else if (objName == "priority_border") {
+            return UIColor(red: 142/255.0, green: 142/255.0, blue: 147/255.0, alpha: 1.0) //Priority Button Border color
         }
         
         
@@ -63,6 +69,34 @@ public class AppColors {
     
     func colorForType(type: String) -> UIColor {
         var color = self.colorForObjectName("tasks_amount_text")
+        if (type == "daily") {
+            return UIColor(red: 0/255.0, green: 184/255.0, blue: 151/255.0, alpha: 1.0) //Daily
+        }
+        else if (type == "total") {
+            return UIColor(red: 12/255.0, green: 151/255.0, blue: 237/255.0, alpha: 1.0) //Total
+        }
+        else if (type == "d1") {
+            return UIColor(red: 234/255.0, green: 15/255.0, blue: 62/255.0, alpha: 1.0) //Sunday
+        }
+        else if (type == "d2") {
+            return UIColor(red: 228/255.0, green: 234/255.0, blue: 15/255.0, alpha: 1.0) //Monday
+        }
+        else if (type == "d3") {
+            return UIColor(red: 15/255.0, green: 234/255.0, blue: 166/255.0, alpha: 1.0) //Teusday
+        }
+        else if (type == "d4") {
+            return UIColor(red: 12/255.0, green: 117/255.0, blue: 207/255.0, alpha: 1.0) //Wednsday
+        }
+        else if (type == "d5") {
+            return UIColor(red: 223/255.0, green: 15/255.0, blue: 234/255.0, alpha: 1.0) //Thursday
+        }
+        else if (type == "d6") {
+            return UIColor(red: 234/255.0, green: 176/255.0, blue: 15/255.0, alpha: 1.0) //Friday
+        }
+        else if (type == "d7") {
+            return UIColor(red: 15/255.0, green: 234/255.0, blue: 234/255.0, alpha: 1.0) //Saturday
+        }
+        
         return color
     }
     

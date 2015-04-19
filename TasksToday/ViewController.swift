@@ -16,7 +16,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     // MARK - Constant Definitions
     let TASK_ROW_HEIGHT  : CGFloat = 45.0
-    let MAIN_MENU_HEIGHT : CGFloat = 200.0
+    let MAIN_MENU_HEIGHT : CGFloat = 250.0
+    let RECE_MENU_HEIGHT : CGFloat = 95.0
     let TOP_BAR_HEIGHT : CGFloat = 65.0
 
     //----------------------------------
@@ -42,7 +43,13 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     @IBAction func tappedMenuBtn(sender: AnyObject) {
         if (!self.menuIsOpen) {
-            toggleMenu(true)
+            if (self.receMenuIsOpen == true) {
+                toggleReceTasksMenu(false)
+                var timer = NSTimer.scheduledTimerWithTimeInterval(0.3, target: self, selector: Selector("openMainMenu"), userInfo: nil, repeats: false)
+            }
+            else {
+                toggleMenu(true)
+            }
         }
         else {
             toggleMenu(false)
@@ -59,7 +66,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     
     // MARK: - App Data Models
-    //Data Models ------------------------
     let tasksModel = TasksModel()
     let appColors = AppColors()
     //----------------------------------
@@ -69,13 +75,15 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     // MARK: - Class Variables
     var tasksDB = NSMutableDictionary()
     var FRController: NSFetchedResultsController!
-    var mainMenuView, menuBGView: UIView!
+    var mainMenuView, menuBGView, receMenuBG, receMenu: UIView!
     var menuIsOpen = false
+    var receMenuIsOpen = false
     var allowCheckmark = true
     var selectedIndexPath = NSIndexPath()
     var editIcon = UIImage(named: "EditCell")
     var trashIcon = UIImage(named: "TrashCell")
-
+    var receTextField = UITextField()
+    var goBtn = UIButton()
     //----------------------------------
     
     
@@ -83,23 +91,36 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     
     func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        return false
+        return true
     }
     
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if (editingStyle == UITableViewCellEditingStyle.Delete) {
-            // handle delete (by removing the data from your array and updating the tableview)
+        
+            
         }
     }
     
+    
     func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [AnyObject]? {
-        var moreRowAction = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: "", handler:{action, indexpath in
+        var moreRowAction = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: "Edit", handler:{action, indexpath in
+            let editView = self.storyboard?.instantiateViewControllerWithIdentifier("new_task_view") as! NewTaskViewController
+            editView.editTaskDB = self.FRController.objectAtIndexPath(indexPath) as! TaskItem
+            editView.isEditingTask = true
+            editView.transitioningDelegate = self.transitionManager
+            self.presentViewController(editView, animated: true, completion: nil)
         })
-        var deleteRowAction = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: "", handler:{action, indexpath in
+        moreRowAction.backgroundColor = UIColor(red: 239/255.0, green: 239/255, blue: 244/255, alpha: 1.0)
+
+        
+        var deleteRowAction = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: "Delete", handler:{action, indexpath in
             self.promtToDelete(indexPath)
         })
-        moreRowAction.backgroundColor = UIColor(patternImage: editIcon!)
-        deleteRowAction.backgroundColor = UIColor(patternImage: trashIcon!)
+        deleteRowAction.backgroundColor = UIColor(red: 239/255.0, green: 239/255, blue: 244/255, alpha: 1.0)
+        
+        let color = self.appColors.colorForObjectName("tasks_amount_text")
+        UIButton.appearance().setTitleColor(color, forState: .Normal)
+
         return [deleteRowAction, moreRowAction]
     }
     
@@ -269,27 +290,19 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     
+    func initParse() {
+
+    }
+    
     func initViewController() {
-        let inset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        let inset = UIEdgeInsets(top: 0, left: 0, bottom: 50, right: 0)
         self.todayTasksTableView.contentInset = inset //setting padding for table top
         self.toolbarDateLabel.text = tasksModel.getFormattedDayDate(NSDate())
+        initParse()
     }
     
     
-    
-    
-    
-    // MARK: - Stats Menu
-    
-    func toggleStatsMenu(shouldOpen: Bool) {
-        
-    }
 
-    func closeStatsMenu() {
-        toggleStatsMenu(false)
-    }
-    
-    
     
     // MARK: - Main Menu
     
@@ -320,7 +333,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         var bgViewRect = CGRectMake(0, TOP_BAR_HEIGHT, self.view.frame.size.width, self.view.frame.size.height)
         
         self.menuBGView = UIView(frame: bgViewRect)
-        self.menuBGView.backgroundColor = appColors.getTransparentShade("menu_h_bg")
+        self.menuBGView.backgroundColor = self.appColors.getTransparentShade("menu_h_bg")
         self.menuBGView.clipsToBounds = true
         
         let tapRec = UITapGestureRecognizer()
@@ -329,45 +342,67 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         self.menuBGView.addGestureRecognizer(tapRec)
         
         self.mainMenuView = UIView(frame: CGRectMake(0, -MAIN_MENU_HEIGHT, self.view.frame.size.width, MAIN_MENU_HEIGHT))
-        self.mainMenuView.backgroundColor = UIColor.whiteColor()
+        self.mainMenuView.backgroundColor = self.appColors.colorForObjectName("pale_white")
         self.menuBGView.addSubview(self.mainMenuView)
         
         var menuWidth = self.menuBGView.frame.size.width
         
-        //self.menuBGView.addSubview(menuSeperatorInRect(CGRectMake(0, 0, menuWidth, 1)))
+        //Menu Buttons Starts ->
         
-        var hisBtn = menuButtonWithSettings("Past List", rect: CGRectMake(40, 0, menuWidth-40, 50))
+        var menuHalf = menuWidth/2
+        
+        var hisBtn = menuButtonWithSettings("Past List", rect: CGRectMake(40, 0, menuHalf-40, 50))
         hisBtn.addTarget(self, action: "showHistory", forControlEvents: .TouchUpInside)
         self.mainMenuView.addSubview(hisBtn)
         
-        self.mainMenuView.addSubview(menuSeperatorInRect(CGRectMake(40, 50, menuWidth, 1)))
+        self.mainMenuView.addSubview(menuSeperatorInRect(CGRectMake(menuHalf, 0, 1, 50)))
         
-        var futBtn = menuButtonWithSettings("Future List", rect: CGRectMake(40, 50, menuWidth-40, 50))
+        var futBtn = menuButtonWithSettings("Future List", rect: CGRectMake(menuWidth-130, 0, menuHalf-40, 50))
         futBtn.addTarget(self, action: "showFuture", forControlEvents: .TouchUpInside)
         self.mainMenuView.addSubview(futBtn)
         
+        self.mainMenuView.addSubview(menuSeperatorInRect(CGRectMake(40, 50, menuWidth, 1)))
+
+        var sendBtn = menuButtonWithSettings("Send Tasks", rect: CGRectMake(40, 50, menuWidth-40, 50))
+        sendBtn.addTarget(self, action: "showSendTasks", forControlEvents: .TouchUpInside)
+        self.mainMenuView.addSubview(sendBtn)
+        
         self.mainMenuView.addSubview(menuSeperatorInRect(CGRectMake(40, 100, menuWidth, 1)))
         
-        var statsBtn = menuButtonWithSettings("Stats", rect: CGRectMake(40, 100, menuWidth-40, 50))
-        statsBtn.addTarget(self, action: "showStats", forControlEvents: .TouchUpInside)
-        self.mainMenuView.addSubview(statsBtn)
+        var receBtn = menuButtonWithSettings("Receive Tasks", rect: CGRectMake(40, 100, menuWidth-40, 50))
+        receBtn.addTarget(self, action: "showReceiveTasks", forControlEvents: .TouchUpInside)
+        self.mainMenuView.addSubview(receBtn)
         
         self.mainMenuView.addSubview(menuSeperatorInRect(CGRectMake(40, 150, menuWidth, 1)))
         
+        var statsBtn = menuButtonWithSettings("Stats", rect: CGRectMake(40, 150, menuWidth-40, 50))
+        statsBtn.addTarget(self, action: "showStats", forControlEvents: .TouchUpInside)
+        self.mainMenuView.addSubview(statsBtn)
         
-        var morBtn = menuButtonWithSettings("More Apps", rect: CGRectMake(40, 150, menuWidth-40, 50))
+        self.mainMenuView.addSubview(menuSeperatorInRect(CGRectMake(40, 200, menuWidth, 1)))
+        
+        
+        var morBtn = menuButtonWithSettings("More Apps", rect: CGRectMake(40, 200, menuWidth-40, 50))
         morBtn.addTarget(self, action: "showMore", forControlEvents: .TouchUpInside)
         self.mainMenuView.addSubview(morBtn)
 
         self.mainMenuView.addSubview(menuIconWithImageNameAndRect("HistoryBtn", rect: CGRectMake(8, 13, 25, 25)))
-        self.mainMenuView.addSubview(menuIconWithImageNameAndRect("FutureBtn", rect: CGRectMake(8, 63, 25, 25)))
-        self.mainMenuView.addSubview(menuIconWithImageNameAndRect("StoreBtn", rect: CGRectMake(8, 113, 25, 25)))
-        self.mainMenuView.addSubview(menuIconWithImageNameAndRect("StoreBtn", rect: CGRectMake(8, 163, 25, 25)))
+        self.mainMenuView.addSubview(menuIconWithImageNameAndRect("FutureBtn", rect: CGRectMake(menuWidth-30, 13, 25, 25)))
+        
+        self.mainMenuView.addSubview(menuIconWithImageNameAndRect("SendList", rect: CGRectMake(8, 63, 25, 25)))
+        self.mainMenuView.addSubview(menuIconWithImageNameAndRect("GetList", rect: CGRectMake(8, 113, 25, 25)))
+
+        self.mainMenuView.addSubview(menuIconWithImageNameAndRect("Stats", rect: CGRectMake(8, 163, 25, 25)))
+        self.mainMenuView.addSubview(menuIconWithImageNameAndRect("StoreBtn", rect: CGRectMake(8, 213, 25, 25)))
 
     }
     
     func tapCloseMenu() {
         self.toggleMenu(false)
+    }
+    
+    func openMainMenu() {
+        self.toggleMenu(true)
     }
     
     func toggleMenu(shouldOpen: Bool) {
@@ -462,6 +497,187 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
     }
     
+    func showSendTasks() {
+        self.toggleMenu(false)
+        let sendView = self.storyboard?.instantiateViewControllerWithIdentifier("send_view") as! SendView
+        sendView.transitioningDelegate = self.transitionManager
+        self.presentViewController(sendView, animated: true, completion: nil)
+        
+    }
+    
+    
+    func buildReceSlideMenu() {
+        var slideRect = CGRectMake(0, TOP_BAR_HEIGHT, self.view.frame.size.width, self.view.frame.size.height)
+        
+        self.receMenuBG = UIView(frame: slideRect)
+        self.receMenuBG.backgroundColor = appColors.getTransparentShade("menu_h_bg")
+        self.receMenuBG.clipsToBounds = true
+        
+        let tapRec = UITapGestureRecognizer()
+        tapRec.numberOfTapsRequired = 1
+        tapRec.addTarget(self, action: "closeReceTasksMenu")
+        self.receMenuBG.addGestureRecognizer(tapRec)
+        
+        self.receMenu = UIView(frame: CGRectMake(0, -RECE_MENU_HEIGHT, self.view.frame.size.width, RECE_MENU_HEIGHT))
+        self.receMenu.backgroundColor = self.appColors.colorForObjectName("pale_white")
+        self.receMenuBG.addSubview(self.receMenu)
+        
+        var menuWidth = self.receMenuBG.frame.size.width
+        
+        //Menu Buttons Starts ->
+        
+        self.receTextField = UITextField(frame: CGRectMake(10, 10, menuWidth-100, 30))
+        self.receTextField.placeholder = "Paste Key"
+        self.receTextField.enabled = false
+        self.receTextField.textColor = appColors.colorForObjectName("section_header_text")
+        self.receMenu.addSubview(self.receTextField)
+        
+        var pasteBtn = menuButtonWithSettings("Paste", rect: CGRectMake(menuWidth-90, 10, 90, 30))
+        pasteBtn.addTarget(self, action: "pasteKey", forControlEvents: .TouchUpInside)
+        pasteBtn.contentHorizontalAlignment = .Center;
+        self.receMenu.addSubview(pasteBtn)
+
+        self.receMenu.addSubview(menuSeperatorInRect(CGRectMake(0, 45, menuWidth, 1)))
+
+        var cancelBtn = menuButtonWithSettings("Cancel", rect: CGRectMake(0, 45, menuWidth/2, 50))
+        cancelBtn.addTarget(self, action: "closeReceTasksMenu", forControlEvents: .TouchUpInside)
+        cancelBtn.contentHorizontalAlignment = .Center;
+        self.receMenu.addSubview(cancelBtn)
+        
+        self.receMenu.addSubview(menuSeperatorInRect(CGRectMake(menuWidth/2, 45, 1, RECE_MENU_HEIGHT-45)))
+        
+        goBtn = menuButtonWithSettings("Get Tasks", rect: CGRectMake(menuWidth/2, 45, menuWidth/2, 50))
+        goBtn.addTarget(self, action: "getSentTasks", forControlEvents: .TouchUpInside)
+        goBtn.contentHorizontalAlignment = .Center;
+        self.receMenu.addSubview(goBtn)
+
+    }
+    
+    
+    func pasteKey() {
+        var str = UIPasteboard.generalPasteboard().string
+        self.receTextField.text = str
+    }
+    
+    func cantFindSentTasks() {
+        var alertText = "Unfortunately we couldn't find tasks using the key provided.\n"
+        var alertView = UIAlertView(title: "Receive Tasks", message: alertText, delegate: nil, cancelButtonTitle: "OK")
+        alertView.show()
+    }
+    
+    func getSentTasks() {
+        if (count(self.receTextField.text) == 0) {
+            var alertText = "Please paste your sent tasks key to get your tasks"
+            var alertView = UIAlertView(title: "Receive Tasks", message: alertText, delegate: nil, cancelButtonTitle: "OK")
+            alertView.show()
+        }
+        else {
+            self.goBtn.setTitle("Loading...", forState: .Normal)
+            self.goBtn.enabled = false
+            
+            var key = self.receTextField.text
+            var query:PFQuery =  PFQuery(className: "SendTasks")
+            query.whereKey("secret", equalTo: key)
+            
+            //TODO: what if there is nothing???
+            
+            query.findObjectsInBackgroundWithBlock({
+                (objects: [AnyObject]?, error: NSError?) in
+                if (error != nil) {
+                    NSLog("error " + error!.localizedDescription)
+                    self.cantFindSentTasks()
+                }
+                else {
+                    for object : PFObject in objects as! [PFObject] {
+                        let items = object.objectForKey("items") as! NSArray
+                        var arr = items[0] as? NSArray
+                        
+                        for (var i=0;i<arr!.count;i++) {
+                            if var item = arr!.objectAtIndex(i) as? NSDictionary {
+                                self.tasksModel.saveNewTask(item)
+                            }
+                        }
+                    }
+                    self.goBtn.setTitle("Get Tasks", forState: .Normal)
+                    self.goBtn.enabled = true
+                }
+                NSNotificationCenter.defaultCenter().postNotificationName("reloadTodaysTasks", object: nil)
+                self.closeReceTasksMenu()
+            }) //end query find objects in background
+
+
+        }
+    }
+    
+    func closeReceTasksMenu() {
+        toggleReceTasksMenu(false)
+    }
+    
+    func showReceTasksMenu() {
+        toggleReceTasksMenu(true)
+    }
+    
+    func toggleReceTasksMenu(shouldOpen: Bool) {
+        if (shouldOpen) {
+            //Show Receive Tasks Menu
+            if (self.receMenuBG == nil) {
+                buildReceSlideMenu()
+            }
+            var currentMenuRect = CGRectMake(0, -RECE_MENU_HEIGHT, self.view.frame.size.width, RECE_MENU_HEIGHT)
+            self.receMenuIsOpen = true
+            self.receMenuBG.layer.opacity = 0.0
+            self.receMenu.frame = currentMenuRect
+            self.view.addSubview(receMenuBG)
+            let onImage = UIImage(named: "MenuOn")
+            
+            self.receTextField.text = ""
+            UIView.animateWithDuration(0.2, animations: {
+                self.receMenuBG.alpha = 1.0
+                }, completion: {
+                    (value: Bool) in
+                    
+                    currentMenuRect.origin.y = 0
+                    UIView.animateWithDuration(0.3, animations: {
+                        self.receMenu.frame = currentMenuRect
+                        }, completion: {
+                            (value: Bool) in
+                            
+                            self.topMenuButton.setImage(onImage, forState: .Normal)
+                            self.topMenuButton.setImage(onImage, forState: .Selected)
+                    })
+            })
+
+            
+        }
+        else {
+            //Close Receive Tasks Menu
+            var closedMenu = CGRectMake(0, -RECE_MENU_HEIGHT, self.view.frame.size.width, RECE_MENU_HEIGHT)
+            let offImage = UIImage(named: "Menu")
+            
+            UIView.animateWithDuration(0.3, animations: {
+                self.receMenu.frame = closedMenu
+                }, completion: {
+                    (value: Bool) in
+                    UIView.animateWithDuration(0.2, animations: {
+                        self.receMenuBG.alpha = 0.0
+                        }, completion: {
+                            (value: Bool) in
+                            self.receMenuIsOpen = false
+                            self.receMenuBG.removeFromSuperview()
+                            self.topMenuButton.setImage(offImage, forState: .Normal)
+                            self.topMenuButton.setImage(offImage, forState: .Selected)
+                    })
+            })
+        }
+    }
+    
+    
+    func showReceiveTasks() {
+        self.toggleMenu(false)
+        var timer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: Selector("showReceTasksMenu"), userInfo: nil, repeats: false)
+
+    }
+    
     
     //||---------------------------------- END CLASS FUNCTIONS SECTION ---------------------------------------||
 
@@ -531,7 +747,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     func setupAds() {
         var adView = GADBannerView()
-        adView.adUnitID = "ca-app-pub-3825073358484269/1892706239"
+        adView.adUnitID = "***"
         adView.rootViewController = self
         
         adView.frame = CGRectMake(0, self.view.frame.size.height-50, self.view.frame.size.width, 50)

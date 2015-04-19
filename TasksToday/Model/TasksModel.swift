@@ -111,9 +111,10 @@ public class TasksModel: NSFetchedResultsControllerDelegate {
         TaskItem.createInManagedObjectContext(moc!, task: itemTask, date: itemDate, comp: false, taskText: itemText, priority: itemPriority)
     }
     
+    
     func getFormattedDayDate(ofDate: NSDate) -> String {
         var dateFormat = NSDateFormatter()
-        dateFormat.dateFormat = "EEE MM/dd"
+        dateFormat.dateFormat = "EEE,MM/dd"
         return dateFormat.stringFromDate(NSDate()) as String
     }
     

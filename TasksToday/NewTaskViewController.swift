@@ -11,7 +11,7 @@ import UIKit
 class NewTaskViewController: UIViewController, UITextFieldDelegate {
 
     // MARK - Constant Definitions
-    let PRIO_BTN_BORDER_WIDTH: CGFloat = 3.0
+    let PRIO_BTN_BORDER_WIDTH: CGFloat = 1.5
     
     // MARK: - Storyboard IBOutlets
     //IBOutlets ------------------------
@@ -51,7 +51,7 @@ class NewTaskViewController: UIViewController, UITextFieldDelegate {
     @IBAction func tappedPriority(sender: AnyObject) {
         if let btn = sender as? UIButton {
             resetAllPriorityButtons()
-            btn.layer.borderColor = UIColor.blackColor().CGColor
+            btn.layer.borderColor = self.appColors.colorForObjectName("priority_border").CGColor
             btn.layer.borderWidth = PRIO_BTN_BORDER_WIDTH
             setCurrentItemPriority(btn.tag)
         }
@@ -130,7 +130,7 @@ class NewTaskViewController: UIViewController, UITextFieldDelegate {
     
     func updateTaskDateTextField(sender: UIDatePicker) {
         var dateFormat = NSDateFormatter()
-        dateFormat.dateFormat = "EEE MM/dd"
+        dateFormat.dateFormat = "EEE,MM/dd"
         var dateStr = dateFormat.stringFromDate(sender.date) as String
         self.taskDateTextField.text = dateStr
         self.taskDate = sender.date
@@ -139,12 +139,13 @@ class NewTaskViewController: UIViewController, UITextFieldDelegate {
     func dismissKeyboard() {
         self.taskDateTextField.resignFirstResponder()
         self.taskTextField.resignFirstResponder()
+        self.taskTextView.resignFirstResponder()
     }
     
     func loadEditingItem() {
         var taskDate = self.editTaskDB.date as NSDate
         var dateFormat = NSDateFormatter()
-        dateFormat.dateFormat = "EEE MM/dd"
+        dateFormat.dateFormat = "EEE,MM/dd"
         var dateStr = dateFormat.stringFromDate(taskDate) as String
         self.taskDateTextField.text = dateStr
         
@@ -160,19 +161,19 @@ class NewTaskViewController: UIViewController, UITextFieldDelegate {
         
         if (priority == 0.0) {
             self.priorityBtn0.layer.borderWidth = PRIO_BTN_BORDER_WIDTH
-            self.priorityBtn0.layer.borderColor = UIColor.blackColor().CGColor
+            self.priorityBtn0.layer.borderColor = self.appColors.colorForObjectName("priority_border").CGColor
         }
         else if (priority == 1.0) {
             self.priorityBtn1.layer.borderWidth = PRIO_BTN_BORDER_WIDTH
-            self.priorityBtn1.layer.borderColor = UIColor.blackColor().CGColor
+            self.priorityBtn1.layer.borderColor = self.appColors.colorForObjectName("priority_border").CGColor
         }
         else if (priority == 2.0) {
             self.priorityBtn2.layer.borderWidth = PRIO_BTN_BORDER_WIDTH
-            self.priorityBtn2.layer.borderColor = UIColor.blackColor().CGColor
+            self.priorityBtn2.layer.borderColor = self.appColors.colorForObjectName("priority_border").CGColor
         }
         else if (priority == 3.0) {
             self.priorityBtn3.layer.borderWidth = PRIO_BTN_BORDER_WIDTH
-            self.priorityBtn3.layer.borderColor = UIColor.blackColor().CGColor
+            self.priorityBtn3.layer.borderColor = self.appColors.colorForObjectName("priority_border").CGColor
         }
     }
     
@@ -183,7 +184,7 @@ class NewTaskViewController: UIViewController, UITextFieldDelegate {
         self.taskDateTextField.inputView = datePicker
         
         var dateFormat = NSDateFormatter()
-        dateFormat.dateFormat = "EEE MM/dd"
+        dateFormat.dateFormat = "EEE,MM/dd"
         var dateStr = dateFormat.stringFromDate(NSDate()) as String
         self.taskDateTextField.text = dateStr
         self.taskTextField.becomeFirstResponder()
@@ -192,7 +193,7 @@ class NewTaskViewController: UIViewController, UITextFieldDelegate {
         applyPriorityColors()
         
         self.priorityBtn0.layer.borderWidth = PRIO_BTN_BORDER_WIDTH
-        self.priorityBtn0.layer.borderColor = UIColor.blackColor().CGColor
+        self.priorityBtn0.layer.borderColor = self.appColors.colorForObjectName("priority_border").CGColor
 
         if (self.isEditingTask == true) {
             loadEditingItem()

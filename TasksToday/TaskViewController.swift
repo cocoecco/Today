@@ -72,7 +72,7 @@ class TaskViewController: UIViewController, UIAlertViewDelegate {
     
     func setTaskDetails() {
         var dateFormat = NSDateFormatter()
-        dateFormat.dateFormat = "EEE MM/dd"
+        dateFormat.dateFormat = "EEE,MM/dd"
         var dateStr = dateFormat.stringFromDate(NSDate()) as String
         self.toolbarLabel.text = dateStr
         

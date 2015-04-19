@@ -153,10 +153,10 @@ class StatsView: UIViewController {
     
     func statViewInLandscapeRect(rectBounds: CGRect, type: String) -> UIView {
         var statRect = rectBounds
-        statRect.origin.x += 2
-        statRect.origin.y += 2
+        statRect.origin.x += 0
+        statRect.origin.y += 0
         statRect.size.width = 0
-        statRect.size.height -= 4
+        statRect.size.height -= 0
         
         var v = UIView(frame: statRect)
         v.layer.cornerRadius = SV_ROUND_NUM
@@ -202,9 +202,9 @@ class StatsView: UIViewController {
     
     func statViewInPortraitRect(rectBounds: CGRect, type: String) -> UIView {
         var statRect = rectBounds
-        statRect.origin.x += 2
-        statRect.origin.y = statRect.size.height-2
-        statRect.size.width = 16
+        statRect.origin.x += 0
+        statRect.origin.y = statRect.size.height-0
+        statRect.size.width = 20
         statRect.size.height = 0
         
         var v = UIView(frame: statRect)
@@ -348,7 +348,7 @@ class StatsView: UIViewController {
 
                     var k = String(format: "d%@", key)
 
-                    var d1StatView = statViewInPortraitRect(v.bounds, type: "d1")
+                    var d1StatView = statViewInPortraitRect(v.bounds, type: k)
                     v.addSubview(d1StatView)
                     var pxVal = pxPortraitValue(v, perce: CGFloat(totalCut))
                     expendPortraitStatViewToRect(d1StatView, height: pxVal)

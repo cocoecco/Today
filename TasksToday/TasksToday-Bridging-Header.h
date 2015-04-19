@@ -5,3 +5,4 @@
 
 #import "GoogleMobileAds/GADBannerView.h"
 #import "GoogleMobileAds/GADRequest.h"
+#import <Parse/Parse.h>

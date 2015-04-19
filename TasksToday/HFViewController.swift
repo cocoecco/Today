@@ -68,12 +68,18 @@ class HFViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
         var moreRowAction = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: "Redo", handler:{action, indexpath in
             self.promtToRedo(indexPath)
         })
-        moreRowAction.backgroundColor = UIColor.orangeColor()
+        moreRowAction.backgroundColor = UIColor(red: 239/255.0, green: 239/255, blue: 244/255, alpha: 1.0)
+        
         
         var deleteRowAction = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: "Delete", handler:{action, indexpath in
             self.promtToDelete(indexPath)
         })
-        deleteRowAction.backgroundColor = UIColor.redColor()
+        deleteRowAction.backgroundColor = UIColor(red: 239/255.0, green: 239/255, blue: 244/255, alpha: 1.0)
+        
+        let color = self.appColors.colorForObjectName("tasks_amount_text")
+        UIButton.appearance().setTitleColor(color, forState: .Normal)
+
+        
         return [deleteRowAction, moreRowAction]
     }
     
@@ -197,6 +203,9 @@ class HFViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
             self.topTitleLabel.text = "Future Tasks"
             reloadFutureTasks()
         }
+        
+        let inset = UIEdgeInsets(top: 0, left: 0, bottom: 50, right: 0)
+        self.tasksTableView.contentInset = inset //setting padding for table top
         
         var swipeGesture = UISwipeGestureRecognizer()
         swipeGesture.addTarget(self, action: "closeHFView")
@@ -327,7 +336,7 @@ class HFViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
     
     func setupAds() {
         var adView = GADBannerView()
-        adView.adUnitID = "ca-app-pub-3825073358484269/1892706239"
+        adView.adUnitID = "***"
         adView.rootViewController = self
         
         adView.frame = CGRectMake(0, self.view.frame.size.height-50, self.view.frame.size.width, 50)
