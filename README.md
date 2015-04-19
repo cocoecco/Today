@@ -5,7 +5,7 @@
 Today - Tasks Manager is a tool that helps you keep track of your daily tasks.
 Today helps you see your progress for today, this week and all times, you can also 
 select tasks from your list and share it with anyone you want.
-
+<br><br>
 The code demonstrates the use of CoreData, UIAnimation, Parse.com and AdMob among other features.
 This app is written in the Swift programming language using XCode 6.3
 <br><br>
